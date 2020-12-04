@@ -14,7 +14,7 @@ if IS_SERVER then
     end
 
     garages.bigCalculus = function(source)
-        for i = 1, 10 do
+        for i = 1, 20 do
             Wait(100)
         end
         return source
@@ -24,16 +24,10 @@ else
 
     Citizen.CreateThread(function()
         garages = LoadRemoteObject('garages')
-    end)
-
-    RegisterCommand('yu', function()
-        print(garages.getGarages())
+        -- print(garages.getGarages())
+        -- print(garages.bigCalculus())
         print(garages.getCount())
-        Wait(1) -- why tho
         print(garages.getCount())
-
-        print("Begin big calculus")
-        print(garages.bigCalculus())
-        print("ended")
+        print(garages.getCount())
     end)
 end

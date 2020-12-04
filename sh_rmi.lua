@@ -6,16 +6,12 @@ local IS_SERVER = IsDuplicityVersion()
 local EVENT_PREFIX = 'rmi:'
 local DEBUG = true
 
--- Shared part
 local tse = TriggerServerEvent
 local tce = TriggerClientEvent
+local event = AddEventHandler
 
 local function netEvent(name, func)
 	RegisterNetEvent(name)
-	AddEventHandler(name, func)
-end
-
-local function event(name, func)
 	AddEventHandler(name, func)
 end
 
@@ -26,17 +22,17 @@ local function log(name, text)
 end
 
 if IS_SERVER then
-    -- Server part
     local function registerMethod(ro, key, func)
         local eventName = ro.prefix .. key .. ':'
 
-        if type(func) == 'function' then        
+        if type(func) == 'function' then   
+            log('rmi-info', 'Registered a new method: "' .. eventName .. '".')
+
+            ro.functions[key] = eventName .. 'send'
+
             netEvent(eventName .. 'request', function(...)
                 tce(eventName .. 'send', source, func(source, ...))
             end)
-
-            log('rmi-info', 'Registered a new method: "' .. eventName .. '".')
-            ro.functions[key] = eventName .. 'send'
         else
             log('rmi-error', 'You tried to register something that isn\'t a method: "' .. eventName .. '".')
         end
@@ -46,13 +42,12 @@ if IS_SERVER then
     -- @param name name of the object
     -- @return the remote object
     function CreateRemoteObject(name)
-        -- Initialiaze the object
         local ro = {}
         ro.prefix = EVENT_PREFIX .. name .. ':'
         ro.functions = {}
+
         setmetatable(ro, { __newindex = registerMethod })
 
-        -- Make it ready to be sent to a client
         netEvent(ro.prefix .. 'get', function()
             tce(ro.prefix .. 'set', source, ro.functions)
         end)
@@ -60,9 +55,14 @@ if IS_SERVER then
         return ro
     end
 else
-    -- Client part
     local function registerMethods(ro, functions)
+        ro.handlers = {}
         for key, event in pairs(functions) do
+            
+            netEvent(event, function(...) -- Register the event one time
+                ro.handlers[key](...)
+            end)
+
             ro[key] = function(...)
                 local eventName = ro.prefix .. key .. ':'
                 local p = promise.new()
@@ -70,9 +70,9 @@ else
                 log('rmi-info', 'New method called : "' .. eventName .. '".')
                 tse(eventName .. 'request', ...)
 
-                netEvent(event, function(args)
+                ro.handlers[key] = function(args)
                     p:resolve(args)
-                end)
+                end
 
                 return Citizen.Await(p)
             end
@@ -83,10 +83,9 @@ else
     -- @param name name of the object
     -- @return the remote object
     function LoadRemoteObject(name)
+        local p = promise.new()
         local ro = {}
         ro.prefix = EVENT_PREFIX .. name .. ':'
-
-        local p = promise.new()
 
         tse(ro.prefix .. 'get')
 
