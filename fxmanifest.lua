@@ -1,14 +1,10 @@
 fx_version 'cerulean'
 game 'gta5'
 
-client_scripts {
-    'cl_ex.lua'
-}
-
-server_scripts {
-    'sv_ex.lua'
-}
+description 'Remote method invocation'
+author 'Elio'
 
 shared_scripts {
-    'sh_rmi.lua'
+    'sh_rmi.lua',
+    'sh_ex.lua'
 }
