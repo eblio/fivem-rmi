@@ -1,32 +1,29 @@
 local IS_SERVER = IsDuplicityVersion()
 
 if IS_SERVER then
-    local garages = CreateRemoteObject('garages')
-    local count = 0
+    local remoteObject = CreateRemoteObject('ro')
 
-    garages.getGarages = function(source)
+    remoteObject.getLocations = function(source)
         return { vector3(0.0, 0.0, 0.0), vector3(1.0, 1.0, 1.0), vector3(2.0, 2.0, 2.0) }
     end
 
-    garages.getCount = function(source)
-        count = count + 1
-        return count
+    remoteObject.multiply = function(source, a, b)
+        return a * b
     end
 
-    garages.bigCalculus = function(source)
+    remoteObject.bigCalculus = function(source)
         for i = 1, 20 do
             Wait(100)
         end
-        return source
+        return 'done'
     end
 else
-    local garages = nil
+    local remoteObject = nil
 
     Citizen.CreateThread(function()
-        garages = LoadRemoteObject('garages')
-        print(garages.getGarages())
-        print(garages.bigCalculus())
-        print(garages.getCount())
-        print(garages.getCount())
+        remoteObject = LoadRemoteObject('ro')
+        print(remoteObject.getLocations())   --> table:XXX
+        print(remoteObject.bigCalculus())    --> done
+        print(remoteObject.multiply(2, 3))   --> 6
     end)
 end
