@@ -32,7 +32,7 @@ if IS_SERVER then
 
         if type(func) == 'function' then        
             netEvent(eventName .. 'request', function(...)
-                tce(eventName .. 'send', source, func(source, ...)) -- Keep in mind I can't do all the magic for you
+                tce(eventName .. 'send', source, func(source, ...))
             end)
 
             log('rmi-info', 'Registered a new method: "' .. eventName .. '".')
@@ -92,11 +92,9 @@ else
 
         netEvent(ro.prefix .. 'set', function(functions)
             registerMethods(ro, functions)
-            p:resolve()
+            p:resolve(ro)
         end)
 
-        Citizen.Await(p)
-
-        return ro
+        return Citizen.Await(p)
     end
 end
