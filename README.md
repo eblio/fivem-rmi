@@ -1,10 +1,19 @@
-# fivem-rmi
+# FiveM - Remote Method Invocation
 Remote method invocation implemented in LUA for Fivem.
 
 ## Description
-Allows you to fetch data from the server synchronously and avoid nested callbacks.
+Tired of managing events synchronization? This piece of code allows you 
+to fetch data from the server synchronously and avoid nested callbacks.
 
-## How to use
+## Usage
+
+### Load
+First, you need to load the file into your resource using : 
+```lua
+shared_script '@fivem-rmi/sh_rmi.lua'
+```
+
+### Functions
 | Function | Scope | Description |
 | --- | --- | --- | 
 | `CreateRemoteObject(string : name)` | Server | Creates a remote object to which you can assign functions. |
@@ -44,6 +53,7 @@ end)
 ```
 
 ## Notes
+* Loading a remote object outside of a thread is not possible ;
 * Loading an undefined remote object may block your thread ;
-* Calling an undefined function on a remoite object may block your thread ;
-* Loading a remote object from different files may break mutual exclusion and lead to various unexpected results ;
+* Calling an undefined function on a remote object may block your thread ;
+* Loading a remote object from different files may break mutual exclusion and lead to various unexpected results.
