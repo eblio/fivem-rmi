@@ -24,9 +24,8 @@ else
 
     Citizen.CreateThread(function()
         garages = LoadRemoteObject('garages')
-        -- print(garages.getGarages())
-        -- print(garages.bigCalculus())
-        print(garages.getCount())
+        print(garages.getGarages())
+        print(garages.bigCalculus())
         print(garages.getCount())
         print(garages.getCount())
     end)
